@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
+      
       - name: Read version from panel/package.json
         id: get_version
         run: |
@@ -92,10 +93,15 @@ jobs:
 
     steps:
       - name: Cleaup releases (keep latest 10)
-        run: |
-          gh release list --limit 100 | awk '{print $1}' | tail -n +11 | while read tag; do
-            echo "Cleaning up release: $tag"
-            gh release delete "$tag" --yes
-          done
+        uses: sgpublic/delete-release-action@v1.1
+        with:
+          release-drop: false
+          release-keep-count: 2
+          release-drop-tag: false
+          pre-release-drop: true
+          pre-release-keep-count: 10
+          pre-release-drop-tag: true
+          draft-drop: false
+          draft-drop-count: -1
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
